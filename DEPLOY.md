@@ -13,7 +13,8 @@ edifica-araucania/
 │   └── cotizar.js              Lógica del cotizador y resumen en vivo
 ├── robots.txt
 ├── sitemap.xml
-├── amplify.yml                   Build spec de Amplify (sin build + custom headers del paso 8)
+├── amplify.yml                   Build spec de Amplify (sin build)
+├── customHttp.yml                Custom headers de Amplify (paso 8)
 ├── DEPLOY.md
 └── backend/contacto/index.mjs    Lambda Node 20: reCAPTCHA v3 + SES v2 (visita y cotización)
 ```
@@ -51,7 +52,7 @@ Región sugerida: `sa-east-1` (SES disponible ahí). Alternativa: Amplify Gen 2 
 7. **Configurar `assets/config.js`**: endpoint, site key, WhatsApp, teléfono visible, enlaces de Google y (opcional) el estimador.
    - Los dos formularios usan el mismo endpoint. El campo `formulario` (`visita` o `cotizacion`) define la validación, y la acción reCAPTCHA debe coincidir (`contacto` o `cotizacion`).
    - La Lambda responde `{ ok: true, ref: "EA-XXXXXX" }`; el código se muestra al cliente y va en el asunto de los correos.
-8. **Headers** (Amplify → Custom headers): ya incluidos en `amplify.yml` (el `Content-Security-Policy` es compatible con reCAPTCHA y Google Fonts). Si se configuran además en la consola, deben coincidir:
+8. **Headers**: definidos en `customHttp.yml` (raíz del repo), que Amplify aplica al desplegar. El `Content-Security-Policy` es compatible con reCAPTCHA y Google Fonts. Alternativa: configurarlos en la consola (Hosting → Custom headers) con el mismo YAML; en ese caso borra `customHttp.yml` para que la consola no quede sobrescrita:
 
 ```yaml
 customHeaders:
