@@ -2,18 +2,29 @@
 // Runtime: Node.js 20.x (ESM). Valida reCAPTCHA v3 y envía correos vía Amazon SES v2.
 //
 // Variables de entorno:
-//   RECAPTCHA_SECRET      Clave secreta reCAPTCHA v3 (idealmente desde SSM/Secrets Manager)
+//   RECAPTCHA_SECRET_PARAM  Nombre del parámetro SSM (SecureString) con la clave secreta reCAPTCHA v3
+//   RECAPTCHA_SECRET      Alternativa directa (solo desarrollo)
+//   TABLA_FORMULARIOS     Tabla DynamoDB donde se guarda cada envío
 //   RECAPTCHA_MIN_SCORE   Umbral de score (default 0.5)
 //   SES_FROM              Remitente verificado, ej: "Edifica Araucanía <no-responder@edificaraucania.cl>"
 //   SES_TO                Destinatario(s) interno(s), separados por coma
 //   ALLOWED_ORIGINS       Orígenes permitidos (CORS), separados por coma
 //   SEND_AUTOREPLY        "true" para enviar confirmación al cliente
 
+// El runtime Node 20 de Lambda ya incluye el SDK v3 (sesv2, dynamodb, ssm).
+import { randomInt } from "node:crypto";
 import { SESv2Client, SendEmailCommand } from "@aws-sdk/client-sesv2";
+import { DynamoDBClient } from "@aws-sdk/client-dynamodb";
+import { DynamoDBDocumentClient, PutCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import { SSMClient, GetParameterCommand } from "@aws-sdk/client-ssm";
 
 const ses = new SESv2Client({});
+const db = DynamoDBDocumentClient.from(new DynamoDBClient({}), { marshallOptions: { removeUndefinedValues: true } });
+const ssm = new SSMClient({});
 const {
   RECAPTCHA_SECRET,
+  RECAPTCHA_SECRET_PARAM,
+  TABLA_FORMULARIOS,
   RECAPTCHA_MIN_SCORE = "0.5",
   SES_FROM,
   SES_TO = "",
@@ -39,10 +50,47 @@ const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<
 const txt = (v, max) => String(v ?? "").replace(/[\r\n]+/g, " ").trim().slice(0, max);
 const n = (v, min, max) => { const x = Number(String(v ?? "").replace(",", ".")); return Number.isFinite(x) ? Math.min(max, Math.max(min, x)) : NaN; };
 const fmt = (x, d = 1) => Number(x).toLocaleString("es-CL", { minimumFractionDigits: d, maximumFractionDigits: d });
-const referencia = () => "EA-" + Date.now().toString(36).slice(-6).toUpperCase();
+// Sin caracteres ambiguos (0/O, 1/I). 31^6 combinaciones; la tabla rechaza duplicados.
+const ALFABETO = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+const referencia = () => "EA-" + Array.from({ length: 6 }, () => ALFABETO[randomInt(ALFABETO.length)]).join("");
+
+let secretoCache;
+async function secretoRecaptcha() {
+  if (RECAPTCHA_SECRET) return RECAPTCHA_SECRET;
+  secretoCache ??= ssm
+    .send(new GetParameterCommand({ Name: RECAPTCHA_SECRET_PARAM, WithDecryption: true }))
+    .then((r) => r.Parameter.Value)
+    .catch((e) => { secretoCache = undefined; throw e; });
+  return secretoCache;
+}
+
+async function guardar(item) {
+  for (let i = 0; i < 3; i++) {
+    const ref = i === 0 ? item.ref : referencia();
+    try {
+      await db.send(new PutCommand({
+        TableName: TABLA_FORMULARIOS,
+        Item: { ...item, ref },
+        ConditionExpression: "attribute_not_exists(ref)",
+      }));
+      return ref;
+    } catch (e) {
+      if (e.name !== "ConditionalCheckFailedException") throw e;
+    }
+  }
+  throw new Error("referencia-duplicada");
+}
+
+const marcarCorreo = (ref, estado, error) =>
+  db.send(new UpdateCommand({
+    TableName: TABLA_FORMULARIOS,
+    Key: { ref },
+    UpdateExpression: "SET correo = :e, correoError = :m",
+    ExpressionAttributeValues: { ":e": estado, ":m": error ? String(error).slice(0, 300) : null },
+  })).catch((e) => console.error("marcar-correo", e));
 
 async function verificarRecaptcha(token, accion, ip) {
-  const params = new URLSearchParams({ secret: RECAPTCHA_SECRET, response: token });
+  const params = new URLSearchParams({ secret: await secretoRecaptcha(), response: token });
   if (ip) params.append("remoteip", ip);
   const r = await fetch("https://www.google.com/recaptcha/api/siteverify", {
     method: "POST",
@@ -50,7 +98,8 @@ async function verificarRecaptcha(token, accion, ip) {
     body: params,
   });
   const d = await r.json();
-  return d.success === true && d.action === accion && Number(d.score) >= Number(RECAPTCHA_MIN_SCORE);
+  const score = Number(d.score);
+  return { ok: d.success === true && d.action === accion && score >= Number(RECAPTCHA_MIN_SCORE), score };
 }
 
 function tablaHtml(titulo, filas) {
@@ -141,14 +190,35 @@ export const handler = async (event) => {
   if (!d.recaptchaToken) return respuesta(400, { ok: false, error: "captcha" }, origin);
 
   const ip = event.requestContext?.http?.sourceIp || event.requestContext?.identity?.sourceIp;
+  let captcha;
   try {
-    if (!(await verificarRecaptcha(d.recaptchaToken, accion, ip))) return respuesta(403, { ok: false, error: "captcha" }, origin);
+    captcha = await verificarRecaptcha(d.recaptchaToken, accion, ip);
+    if (!captcha.ok) return respuesta(403, { ok: false, error: "captcha" }, origin);
   } catch (e) {
     console.error("recaptcha", e);
     return respuesta(502, { ok: false, error: "captcha" }, origin);
   }
 
-  const ref = referencia();
+  // Se guarda antes de enviar correos: si SES falla, el contacto no se pierde.
+  let ref;
+  try {
+    ref = await guardar({
+      ref: referencia(),
+      tipo: accion,
+      creado: new Date().toISOString(),
+      contacto: c,
+      detalle: obra,
+      correo: "pendiente",
+      captchaScore: captcha.score,
+      ip,
+      userAgent: txt(event.headers?.["user-agent"] || event.headers?.["User-Agent"], 300),
+      origen: origin,
+    });
+  } catch (e) {
+    console.error("dynamodb", e);
+    return respuesta(502, { ok: false, error: "guardado" }, origin);
+  }
+
   const filasContacto = [
     ["Nombre", c.nombre], ["Teléfono", c.telefono], ["Correo", c.email],
     ["Comuna", c.comuna], ["Inicio", c.plazo || "-"],
@@ -210,8 +280,11 @@ ${secciones.map(([t, f]) => tablaHtml(t, f)).join("")}
     }
   } catch (e) {
     console.error("ses", e);
-    return respuesta(502, { ok: false, error: "correo" }, origin);
+    // El envío ya está guardado: se responde ok y se deja el fallo registrado para reintentar a mano.
+    await marcarCorreo(ref, "error", e.message);
+    return respuesta(200, { ok: true, ref }, origin);
   }
 
+  await marcarCorreo(ref, "enviado");
   return respuesta(200, { ok: true, ref }, origin);
 };

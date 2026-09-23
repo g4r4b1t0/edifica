@@ -7,10 +7,7 @@
   "engines": {
     "node": ">=20"
   },
-  "dependencies": {
-    "@aws-sdk/client-sesv2": "^3.700.0"
-  },
   "scripts": {
-    "empaquetar": "npm install --omit=dev && zip -r edifica-contacto.zip index.mjs package.json node_modules"
+    "check": "node --check index.mjs"
   }
 }

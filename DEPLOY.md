@@ -13,10 +13,11 @@ edifica-araucania/
 │   └── cotizar.js              Lógica del cotizador y resumen en vivo
 ├── robots.txt
 ├── sitemap.xml
+├── template.yaml                 CloudFormation/SAM: API + Lambda + DynamoDB + permisos SES
 ├── amplify.yml                   Build spec de Amplify (sin build)
 ├── customHttp.yml                Custom headers de Amplify (paso 8)
 ├── DEPLOY.md
-└── backend/contacto/index.mjs    Lambda Node 20: reCAPTCHA v3 + SES v2 (visita y cotización)
+└── backend/contacto/index.mjs    Lambda Node 20: reCAPTCHA v3 + DynamoDB + SES v2 (visita y cotización)
 ```
 
 ## Arquitectura
@@ -26,10 +27,26 @@ Navegador ──> Amplify Hosting (index.html, CloudFront, HTTPS)
     │
     └─ POST JSON ──> API Gateway HTTP API (/contacto) ──> Lambda
                                                           ├─> Google siteverify (reCAPTCHA v3)
+                                                          ├─> DynamoDB (guarda cada envío, antes de enviar correos)
                                                           └─> Amazon SES v2 (aviso interno + autorespuesta)
 ```
 
 Región sugerida: `sa-east-1` (SES disponible ahí). Alternativa: Amplify Gen 2 con `defineFunction` y Function URL, si prefieres todo en un solo stack.
+
+## Backend con CloudFormation
+
+`template.yaml` crea la API, la Lambda, la tabla DynamoDB `Formularios` (clave `ref`, índice `tipo-creado`, on-demand, PITR, `DeletionPolicy: Retain`) y los permisos mínimos. Reemplaza los pasos 3 a 5 de abajo. Antes de desplegar (usa un perfil de la cuenta correcta):
+
+```bash
+aws ssm put-parameter --region sa-east-1 --name /edifica/recaptcha-secret --type SecureString --value '<SECRET>'
+aws cloudformation package --template-file template.yaml --s3-bucket <bucket-artefactos> --output-template-file /tmp/packaged.yaml
+aws cloudformation deploy --region sa-east-1 --stack-name edifica-contacto --template-file /tmp/packaged.yaml \
+  --capabilities CAPABILITY_IAM --parameter-overrides SesTo=contacto@edificaraucania.cl AllowedOrigins=https://edificaraucania.cl,https://www.edificaraucania.cl
+```
+
+El output `Endpoint` va en `API_ENDPOINT` de `assets/config.js`. La identidad SES (paso 2) se verifica aparte.
+
+Cada envío queda en DynamoDB con `ref`, `tipo` (`contacto` o `cotizacion`), `creado`, `contacto`, `detalle`, `captchaScore`, `ip` y `correo` (`pendiente`, `enviado` o `error`). Si SES falla, el envío igual queda guardado y la API responde ok; busca `correo = error` para reintentar a mano.
 
 ## Pasos
 

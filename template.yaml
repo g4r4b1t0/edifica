@@ -1,0 +1,96 @@
+# Backend de formularios: API Gateway HTTP API + Lambda + DynamoDB + SES.
+# Despliegue: ver DEPLOY.md, sección "Backend con CloudFormation".
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: Edifica Araucania - formularios de visita tecnica y cotizacion
+
+Parameters:
+  SesFrom:
+    Type: String
+    Default: "Edifica Araucanía <no-responder@edificaraucania.cl>"
+  SesTo:
+    Type: String
+    Description: Destinatarios internos separados por coma
+  AllowedOrigins:
+    Type: String
+    Default: "https://edificaraucania.cl,https://www.edificaraucania.cl"
+  RecaptchaSecretParam:
+    Type: String
+    Default: /edifica/recaptcha-secret
+    Description: Parametro SSM SecureString (crearlo antes, ver DEPLOY.md)
+  RecaptchaMinScore:
+    Type: String
+    Default: "0.5"
+
+Resources:
+  Formularios:
+    Type: AWS::DynamoDB::Table
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      BillingMode: PAY_PER_REQUEST
+      AttributeDefinitions:
+        - { AttributeName: ref, AttributeType: S }
+        - { AttributeName: tipo, AttributeType: S }
+        - { AttributeName: creado, AttributeType: S }
+      KeySchema:
+        - { AttributeName: ref, KeyType: HASH }
+      GlobalSecondaryIndexes:
+        - IndexName: tipo-creado
+          KeySchema:
+            - { AttributeName: tipo, KeyType: HASH }
+            - { AttributeName: creado, KeyType: RANGE }
+          Projection: { ProjectionType: ALL }
+      PointInTimeRecoverySpecification:
+        PointInTimeRecoveryEnabled: true
+      SSESpecification:
+        SSEEnabled: true
+
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 5
+        ThrottlingRateLimit: 2
+
+  Funcion:
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: edifica-contacto
+      CodeUri: backend/contacto/
+      Handler: index.handler
+      Runtime: nodejs20.x
+      MemorySize: 256
+      Timeout: 10
+      Environment:
+        Variables:
+          TABLA_FORMULARIOS: !Ref Formularios
+          RECAPTCHA_SECRET_PARAM: !Ref RecaptchaSecretParam
+          RECAPTCHA_MIN_SCORE: !Ref RecaptchaMinScore
+          SES_FROM: !Ref SesFrom
+          SES_TO: !Ref SesTo
+          ALLOWED_ORIGINS: !Ref AllowedOrigins
+          SEND_AUTOREPLY: "true"
+      Policies:
+        - DynamoDBWritePolicy: { TableName: !Ref Formularios }
+        - Statement:
+            - Effect: Allow
+              Action: ssm:GetParameter
+              Resource: !Sub arn:${AWS::Partition}:ssm:${AWS::Region}:${AWS::AccountId}:parameter${RecaptchaSecretParam}
+            - Effect: Allow
+              Action: ses:SendEmail
+              Resource: !Sub arn:${AWS::Partition}:ses:${AWS::Region}:${AWS::AccountId}:identity/*
+      Events:
+        Post:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /contacto, Method: POST }
+        Options:
+          Type: HttpApi
+          Properties: { ApiId: !Ref Api, Path: /contacto, Method: OPTIONS }
+
+Outputs:
+  Endpoint:
+    Description: Valor para API_ENDPOINT en assets/config.js
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/contacto
+  Tabla:
+    Value: !Ref Formularios

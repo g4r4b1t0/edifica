@@ -3,12 +3,12 @@
    ========================================================= */
 window.CONFIG = {
   // Endpoint del backend (API Gateway + Lambda). Ver DEPLOY.md
-  API_ENDPOINT: "https://REEMPLAZAR.execute-api.sa-east-1.amazonaws.com/contacto",
+  API_ENDPOINT: "https://h6pddmuujl.execute-api.sa-east-1.amazonaws.com/contacto",
   // Clave de sitio reCAPTCHA v3 (pública)
-  RECAPTCHA_SITE_KEY: "REEMPLAZAR_SITE_KEY",
+  RECAPTCHA_SITE_KEY: "6LfYkcstAAAAAIN3Z_NXrKlwAqAC5KnfjnmzI1Ha",
   // WhatsApp en formato internacional sin + ni espacios
-  WHATSAPP_NUMERO: "56900000000",
-  TELEFONO_VISIBLE: "+56 9 0000 0000",
+  WHATSAPP_NUMERO: "56995924753",
+  TELEFONO_VISIBLE: "+56 9 9592 4753",
   WHATSAPP_MENSAJE: "Hola, quiero cotizar una ampliación para mi casa.",
   // Google Business Profile
   GOOGLE_RESENAS_URL: "REEMPLAZAR_URL_FICHA_GOOGLE",
