@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="es-CL">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Cotiza tu ampliación en La Araucanía | Edifica Araucanía</title>
+<meta name="description" content="Cotiza tu ampliación en Temuco y La Araucanía: indica tipo de obra, medidas, ventanas, radier e instalaciones y recibe un rango de precio.">
+<link rel="canonical" href="https://edificaraucania.cl/cotizar/">
+<meta name="theme-color" content="#1E3B30">
+<meta property="og:type" content="website">
+<meta property="og:locale" content="es_CL">
+<meta property="og:site_name" content="Edifica Araucanía">
+<meta property="og:title" content="Cotiza tu ampliación | Edifica Araucanía">
+<meta property="og:description" content="Medidas, ventanas e instalaciones en 3 pasos. Te respondemos con un rango de precio.">
+<meta property="og:url" content="https://edificaraucania.cl/cotizar/">
+<meta property="og:image" content="https://edificaraucania.cl/og.jpg">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='12' fill='%231E3B30'/%3E%3Cpath d='M12 44V28l14-12 14 12v16z' fill='none' stroke='%23F3F5F1' stroke-width='4' stroke-linejoin='round'/%3E%3Cpath d='M40 30l12 4v10H40z' fill='%23C28A45'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/estilos.css">
+</head>
+<body>
+
+<a class="solo-lectores" href="#form-cotizar">Ir al cotizador</a>
+
+<header class="cabecera">
+  <div class="envoltura">
+    <a class="marca" href="/" aria-label="Edifica Araucanía, inicio">
+      <svg viewBox="0 0 64 64" width="34" height="34" aria-hidden="true"><rect width="64" height="64" rx="12" fill="#2B5142"/><path d="M12 44V28l14-12 14 12v16z" fill="none" stroke="#F3F5F1" stroke-width="4" stroke-linejoin="round"/><path d="M40 30l12 4v10H40z" fill="#C28A45"/></svg>
+      Edifica Araucanía
+    </a>
+    <nav class="nav" aria-label="Principal">
+      <a href="/#servicios">Servicios</a>
+      <a href="/#seguridad">Tu seguridad</a>
+      <a href="/#preguntas">Preguntas</a>
+      <a class="boton boton-madera" data-wa href="/#contacto">WhatsApp</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+<section class="cabeza-cotizar">
+  <div class="envoltura">
+    <h1>Cotiza tu ampliación</h1>
+    <!-- REEMPLAZAR: validar plazo de respuesta -->
+    <p>Cuéntanos qué quieres construir, sus medidas, ventanas e instalaciones. Te respondemos en 2 días hábiles con un rango de precio, y el presupuesto cerrado lo entregamos después de la visita técnica sin costo.</p>
+  </div>
+</section>
+
+<section class="cotizador">
+  <div class="envoltura">
+    <div>
+      <ol class="progreso" aria-label="Pasos del cotizador">
+        <li aria-current="step">La ampliación</li>
+        <li>Ventanas e instalaciones</li>
+        <li>Tus datos</li>
+      </ol>
+
+      <form class="form-cotizar" id="form-cotizar" novalidate>
+
+        <!-- ================= PASO 1 ================= -->
+        <div class="etapa" data-etapa="1">
+          <h2 tabindex="-1">La ampliación</h2>
+          <p class="ayuda-etapa">Si no sabes algo con exactitud, elige la opción más cercana. Lo afinamos en la visita.</p>
+
+          <fieldset class="grupo">
+            <legend>Tipo de ampliación</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="tipo" value="Dormitorio" required><span>Dormitorio</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Baño"><span>Baño</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Cocina"><span>Cocina</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Living o comedor"><span>Living o comedor</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Oficina"><span>Oficina</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Terraza techada"><span>Terraza techada</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Quincho"><span>Quincho</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Bodega o leñera"><span>Bodega o leñera</span></label>
+              <label class="opcion"><input type="radio" name="tipo" value="Otro"><span>Otro</span></label>
+            </div>
+            <div class="campo" id="campo-tipo-otro" hidden style="margin-top:.8rem">
+              <label for="c-tipo-otro">¿Qué quieres construir?</label>
+              <input id="c-tipo-otro" name="tipo_otro" type="text" maxlength="80">
+            </div>
+          </fieldset>
+
+          <fieldset class="grupo">
+            <legend>¿En qué piso?</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="nivel" value="Primer piso" required checked><span>Primer piso</span></label>
+              <label class="opcion"><input type="radio" name="nivel" value="Segundo piso"><span>Segundo piso</span></label>
+              <label class="opcion"><input type="radio" name="nivel" value="Ambos pisos"><span>Ambos pisos</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="grupo">
+            <legend>Medidas aproximadas</legend>
+            <span class="ayuda" id="ayuda-medidas">Ancho y largo del espacio nuevo. La altura es de piso a cielo; lo normal es 2,40 m.</span>
+            <div class="dimensiones">
+              <div class="campo">
+                <label for="c-ancho">Ancho</label>
+                <div class="con-unidad"><input id="c-ancho" name="ancho" type="text" inputmode="decimal" required pattern="^\d{1,2}([.,]\d{1,2})?$" placeholder="4,0" aria-describedby="ayuda-medidas"><span class="unidad">m</span></div>
+              </div>
+              <div class="campo">
+                <label for="c-largo">Largo</label>
+                <div class="con-unidad"><input id="c-largo" name="largo" type="text" inputmode="decimal" required pattern="^\d{1,2}([.,]\d{1,2})?$" placeholder="4,0" aria-describedby="ayuda-medidas"><span class="unidad">m</span></div>
+              </div>
+              <div class="campo">
+                <label for="c-altura">Altura</label>
+                <div class="con-unidad"><input id="c-altura" name="altura" type="text" inputmode="decimal" required pattern="^\d{1}([.,]\d{1,2})?$" value="2,40" aria-describedby="ayuda-medidas"><span class="unidad">m</span></div>
+              </div>
+            </div>
+            <p class="superficie" id="superficie" aria-live="polite">Superficie: <strong>–</strong></p>
+          </fieldset>
+
+          <fieldset class="grupo">
+            <legend>¿Cómo se conecta con la casa?</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="conexion" value="Adosada a la casa" checked><span>Adosada a la casa</span></label>
+              <label class="opcion"><input type="radio" name="conexion" value="Separada de la casa"><span>Separada de la casa</span></label>
+            </div>
+          </fieldset>
+
+          <div class="dos-col">
+            <fieldset class="grupo">
+              <legend>Material preferido</legend>
+              <div class="opciones">
+                <label class="opcion"><input type="radio" name="estructura" value="Que me recomienden" checked><span>Que me recomienden</span></label>
+                <label class="opcion"><input type="radio" name="estructura" value="Madera"><span>Madera</span></label>
+                <label class="opcion"><input type="radio" name="estructura" value="Metalcon"><span>Metalcon</span></label>
+                <label class="opcion"><input type="radio" name="estructura" value="Albañilería"><span>Albañilería</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="grupo">
+              <legend>Terreno</legend>
+              <div class="opciones">
+                <label class="opcion"><input type="radio" name="terreno" value="Plano" checked><span>Plano</span></label>
+                <label class="opcion"><input type="radio" name="terreno" value="Con pendiente"><span>Con pendiente</span></label>
+                <label class="opcion"><input type="radio" name="terreno" value="No sé"><span>No sé</span></label>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+        <!-- ================= PASO 2 ================= -->
+        <div class="etapa" data-etapa="2" hidden>
+          <h2 tabindex="-1">Ventanas e instalaciones</h2>
+          <p class="ayuda-etapa">Agrega una fila por cada tamaño de ventana. Si no sabes las medidas, elige la más parecida.</p>
+
+          <fieldset class="grupo">
+            <legend>Ventanas</legend>
+            <div id="ventanas-lista"></div>
+            <p class="sin-ventanas" id="sin-ventanas" hidden>Sin ventanas.</p>
+            <button type="button" class="agregar" id="agregar-ventana">Agregar ventana</button>
+          </fieldset>
+
+          <div class="dos-col">
+            <fieldset class="grupo">
+              <legend>Tipo de vidrio</legend>
+              <div class="opciones">
+                <label class="opcion"><input type="radio" name="vidrio" value="Termopanel" checked><span>Termopanel</span></label>
+                <label class="opcion"><input type="radio" name="vidrio" value="Vidrio simple"><span>Vidrio simple</span></label>
+                <label class="opcion"><input type="radio" name="vidrio" value="Que me recomienden"><span>Que me recomienden</span></label>
+              </div>
+            </fieldset>
+            <fieldset class="grupo">
+              <legend>Marco de ventanas</legend>
+              <div class="opciones">
+                <label class="opcion"><input type="radio" name="marco" value="Que me recomienden" checked><span>Que me recomienden</span></label>
+                <label class="opcion"><input type="radio" name="marco" value="PVC"><span>PVC</span></label>
+                <label class="opcion"><input type="radio" name="marco" value="Aluminio"><span>Aluminio</span></label>
+                <label class="opcion"><input type="radio" name="marco" value="Madera"><span>Madera</span></label>
+              </div>
+            </fieldset>
+          </div>
+
+          <fieldset class="grupo">
+            <legend>Puertas</legend>
+            <div class="dos-col">
+              <div class="campo">
+                <label for="c-puertas-ext">Puertas hacia el exterior</label>
+                <input id="c-puertas-ext" name="puertas_ext" type="number" min="0" max="5" value="0" inputmode="numeric">
+              </div>
+              <div class="campo">
+                <label for="c-puertas-int">Puertas interiores</label>
+                <input id="c-puertas-int" name="puertas_int" type="number" min="0" max="10" value="1" inputmode="numeric">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="grupo">
+            <legend>¿Necesita radier?</legend>
+            <span class="ayuda">El radier es la base de hormigón sobre la que se construye.</span>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="radier" value="Sí" checked><span>Sí</span></label>
+              <label class="opcion"><input type="radio" name="radier" value="Ya existe radier o base"><span>Ya existe radier o base</span></label>
+              <label class="opcion"><input type="radio" name="radier" value="No sé"><span>No sé</span></label>
+            </div>
+          </fieldset>
+
+          <fieldset class="grupo">
+            <legend>¿Necesita circuito eléctrico?</legend>
+            <div class="opciones">
+              <label class="opcion"><input type="radio" name="electricidad" value="Sí" checked><span>Sí</span></label>
+              <label class="opcion"><input type="radio" name="electricidad" value="No"><span>No</span></label>
+            </div>
+            <div class="sub-bloque" id="detalle-electrico">
+              <div class="campo">
+                <label for="c-enchufes">Enchufes aproximados</label>
+                <input id="c-enchufes" name="enchufes" type="number" min="0" max="30" value="4" inputmode="numeric">
+              </div>
+              <div class="campo">
+                <label for="c-luces">Puntos de luz</label>
+                <input id="c-luces" name="luces" type="number" min="0" max="20" value="1" inputmode="numeric">
+              </div>
+            </div>
+          </fieldset>
+
+          <fieldset class="grupo">
+            <legend>Agua y gas</legend>
+            <span class="ayuda">Marca lo que necesita. Para baño y cocina ya dejamos marcado lo habitual.</span>
+            <div class="opciones">
+              <label class="opcion"><input type="checkbox" name="instalaciones" value="Agua fría"><span>Agua fría</span></label>
+              <label class="opcion"><input type="checkbox" name="instalaciones" value="Agua caliente"><span>Agua caliente</span></label>
+              <label class="opcion"><input type="checkbox" name="instalaciones" value="Desagüe"><span>Desagüe</span></label>
+              <label class="opcion"><input type="checkbox" name="instalaciones" value="Gas"><span>Gas</span></label>
+            </div>
+          </fieldset>
+
+          <div class="dos-col">
+            <fieldset class="grupo">
+              <legend>Nivel de terminación</legend>
+              <div class="opciones">
+                <label class="opcion"><input type="radio" name="terminaciones" value="Llave en mano" checked><span>Lista para usar</span></label>
+                <label class="opcion"><input type="radio" name="terminaciones" value="Obra gruesa"><span>Solo obra gruesa</span></label>
+              </div>
+              <span class="ayuda" style="margin-top:.6rem">Obra gruesa: estructura, techo y cierre, sin terminaciones interiores.</span>
+            </fieldset>
+            <fieldset class="grupo">
+              <legend>Permiso municipal</legend>
+              <div class="opciones">
+                <label class="opcion"><input type="radio" name="permiso" value="Necesito gestionarlo"><span>Necesito gestionarlo</span></label>
+                <label class="opcion"><input type="radio" name="permiso" value="Ya lo tengo"><span>Ya lo tengo</span></label>
+                <label class="opcion"><input type="radio" name="permiso" value="No sé" checked><span>No sé</span></label>
+              </div>
+            </fieldset>
+          </div>
+        </div>
+
+        <!-- ================= PASO 3 ================= -->
+        <div class="etapa" data-etapa="3" hidden>
+          <h2 tabindex="-1">Tus datos</h2>
+          <p class="ayuda-etapa">Los usamos solo para enviarte la cotización y coordinar la visita.</p>
+
+          <div class="campos">
+            <div class="campo">
+              <label for="c-nombre">Nombre</label>
+              <input id="c-nombre" name="nombre" type="text" autocomplete="name" required maxlength="80">
+            </div>
+            <div class="campo">
+              <label for="c-email">Correo</label>
+              <input id="c-email" name="email" type="email" autocomplete="email" required maxlength="120">
+            </div>
+            <div class="campo">
+              <label for="c-telefono">Teléfono o WhatsApp</label>
+              <input id="c-telefono" name="telefono" type="tel" autocomplete="tel" inputmode="tel" required placeholder="+56 9 1234 5678" pattern="^[+0-9 ()-]{8,20}$" maxlength="20">
+            </div>
+            <div class="campo">
+              <label for="c-comuna">Comuna</label>
+              <select id="c-comuna" name="comuna" required>
+                <option value="">Elige una</option>
+                <option>Temuco</option>
+                <option>Padre Las Casas</option>
+                <option>Labranza</option>
+                <option>Lautaro</option>
+                <option>Vilcún</option>
+                <option>Freire</option>
+                <option>Nueva Imperial</option>
+                <option>Otra comuna</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="c-plazo">Cuándo quieres empezar</label>
+              <select id="c-plazo" name="plazo">
+                <option>Lo antes posible</option>
+                <option>En 1 a 3 meses</option>
+                <option>En más de 3 meses</option>
+                <option>Solo estoy cotizando</option>
+              </select>
+            </div>
+            <div class="campo">
+              <label for="c-presupuesto">Presupuesto que tienes en mente</label>
+              <select id="c-presupuesto" name="presupuesto">
+                <option>Prefiero no decir</option>
+                <option>Menos de $3 millones</option>
+                <option>$3 a $6 millones</option>
+                <option>$6 a $10 millones</option>
+                <option>$10 a $20 millones</option>
+                <option>Más de $20 millones</option>
+              </select>
+            </div>
+            <div class="campo ancho">
+              <label for="c-mensaje">Algo más que debamos saber</label>
+              <textarea id="c-mensaje" name="mensaje" maxlength="1500" aria-describedby="c-mensaje-ayuda"></textarea>
+              <span class="ayuda" id="c-mensaje-ayuda">Opcional. Después de enviar podrás mandarnos fotos del lugar por WhatsApp.</span>
+            </div>
+
+            <div class="trampa" aria-hidden="true">
+              <label for="c-web">No completar</label>
+              <input id="c-web" name="sitio_web" type="text" tabindex="-1" autocomplete="off">
+            </div>
+
+            <label class="acepto">
+              <input type="checkbox" name="acepta" required>
+              <span>Acepto que Edifica Araucanía use estos datos para enviarme la cotización y contactarme.</span>
+            </label>
+
+            <p class="estado" id="c-estado" role="alert" hidden></p>
+
+            <p class="legal-captcha">Este sitio está protegido por reCAPTCHA y aplican la <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Política de privacidad</a> y los <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Términos del servicio</a> de Google.</p>
+          </div>
+        </div>
+
+        <div class="nav-etapas">
+          <button type="button" class="boton boton-volver" id="btn-volver" hidden>Volver</button>
+          <button type="submit" class="boton boton-primario" id="btn-siguiente">Siguiente</button>
+        </div>
+      </form>
+
+      <div class="confirmacion" id="confirmacion" hidden tabindex="-1">
+        <h2>Cotización enviada</h2>
+        <p>Revisamos tus datos y te enviamos un rango de precio al correo. Si algo no calza, te llamamos antes para aclararlo.</p>
+        <span class="codigo" id="codigo-ref">EA-000000</span>
+        <p>Si nos mandas fotos del lugar donde iría la ampliación, la cotización sale más precisa.</p>
+        <div class="acciones">
+          <a class="boton boton-madera" id="wa-fotos" href="#" target="_blank" rel="noopener">Enviar fotos por WhatsApp</a>
+          <a class="boton boton-linea" href="/">Volver al inicio</a>
+        </div>
+      </div>
+    </div>
+
+    <aside class="resumen" aria-labelledby="resumen-titulo">
+      <h2 id="resumen-titulo">Tu ampliación</h2>
+      <dl>
+        <div><dt>Superficie</dt><dd class="grande" id="r-superficie">– m²</dd></div>
+        <div><dt>Tipo</dt><dd id="r-tipo">Sin elegir</dd></div>
+        <div><dt>Medidas</dt><dd id="r-medidas">–</dd></div>
+        <div><dt>Ventanas</dt><dd id="r-ventanas">–</dd></div>
+        <div><dt>Radier</dt><dd id="r-radier">–</dd></div>
+        <div><dt>Instalaciones</dt><dd id="r-instalaciones">–</dd></div>
+        <div><dt>Terminación</dt><dd id="r-terminacion">–</dd></div>
+      </dl>
+      <div class="estimado" id="r-estimado" hidden>
+        <p class="rotulo">Rango referencial</p>
+        <p class="grande" id="r-rango">–</p>
+        <small>Valor estimado según superficie y tipo. No es un presupuesto: el precio cerrado se entrega después de la visita técnica.</small>
+      </div>
+      <p class="nota-resumen">El resumen se actualiza mientras completas el formulario.</p>
+    </aside>
+  </div>
+</section>
+</main>
+
+<footer class="pie">
+  <div class="envoltura">
+    <p>© <span id="anio">2026</span> Edifica Araucanía. Ampliaciones de casas en Temuco y La Araucanía.</p>
+    <p><a href="mailto:contacto@edificaraucania.cl">contacto@edificaraucania.cl</a></p>
+  </div>
+</footer>
+
+<template id="tpl-ventana">
+  <div class="ventana-fila">
+    <span class="v-titulo">Ventana</span>
+    <div class="campo">
+      <label>Tamaño
+        <select data-v="tamano">
+          <option value="pequena">Pequeña, 60 × 60 cm (baño)</option>
+          <option value="mediana" selected>Mediana, 100 × 100 cm</option>
+          <option value="grande">Grande, 150 × 120 cm</option>
+          <option value="ventanal">Ventanal, 200 × 200 cm</option>
+          <option value="otra">Otra medida</option>
+        </select>
+      </label>
+    </div>
+    <div class="campo">
+      <label>Cantidad
+        <input data-v="cantidad" type="number" min="1" max="20" value="1" inputmode="numeric" required>
+      </label>
+    </div>
+    <button type="button" class="quitar" data-quitar>Quitar</button>
+    <div class="v-medidas" hidden>
+      <div class="campo"><label>Ancho (cm)<input data-v="ancho" type="number" min="20" max="600" inputmode="numeric"></label></div>
+      <div class="campo"><label>Alto (cm)<input data-v="alto" type="number" min="20" max="300" inputmode="numeric"></label></div>
+    </div>
+  </div>
+</template>
+
+<script src="../assets/config.js"></script>
+<script src="../assets/comun.js"></script>
+<script src="../assets/cotizar.js"></script>
+</body>
+</html>

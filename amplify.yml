@@ -1,0 +1,33 @@
+# Amplify Hosting: sitio estático sin build.
+# Los customHeaders deben coincidir con el paso 8 de DEPLOY.md.
+# REEMPLAZAR: al crear og.jpg y /obras/ con fotos reales, agregarlas a artifacts.files
+# (og.jpg y obras/**/*) para que se publiquen.
+version: 1
+frontend:
+  phases:
+    build:
+      commands:
+        - echo "Sitio estático: sin proceso de build"
+  artifacts:
+    baseDirectory: /
+    files:
+      - index.html
+      - cotizar/**/*
+      - assets/**/*
+      - robots.txt
+      - sitemap.xml
+customHeaders:
+  - pattern: '**/*'
+    headers:
+      - key: Strict-Transport-Security
+        value: max-age=31536000; includeSubDomains
+      - key: X-Content-Type-Options
+        value: nosniff
+      - key: Referrer-Policy
+        value: strict-origin-when-cross-origin
+      - key: Content-Security-Policy
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; frame-src https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://www.gstatic.com; connect-src 'self' https://*.execute-api.sa-east-1.amazonaws.com https://www.google.com"
+  - pattern: '/assets/**'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=86400
