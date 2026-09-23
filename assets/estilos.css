@@ -79,8 +79,8 @@ p{margin:0}
   border-bottom:1px solid rgba(242,242,242,.12);
 }
 .cabecera .envoltura{display:flex;align-items:center;justify-content:space-between;gap:1rem;min-height:68px}
-.marca{display:flex;align-items:center;gap:.6rem;text-decoration:none;font-weight:800;font-variation-settings:"wdth" 120;font-size:1.125rem;letter-spacing:-.01em}
-.marca svg{width:34px;height:34px}
+.marca{display:inline-flex;align-items:center;text-decoration:none;background:var(--blanco);padding:.3rem .6rem;border-radius:10px}
+.marca img{height:44px;width:auto;display:block}
 .nav{display:flex;align-items:center;gap:1.6rem}
 .nav a{text-decoration:none;font-size:var(--t-s);opacity:.88}
 .nav a:hover{opacity:1;text-decoration:underline;text-underline-offset:4px}
