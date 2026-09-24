@@ -26,14 +26,26 @@
   // reCAPTCHA v2 (casilla con desafío): un widget por página, dentro de [data-recaptcha]
   let widgetId = null;
   const contenedor = document.querySelector("[data-recaptcha]");
+  // Se carga solo cuando el formulario está por verse o se toca, para no penalizar el rendimiento de la página
   if (contenedor && configurado(C.RECAPTCHA_SITE_KEY)) {
     window.eaRecaptchaListo = () => {
       widgetId = grecaptcha.render(contenedor, { sitekey: C.RECAPTCHA_SITE_KEY });
     };
-    const s = document.createElement("script");
-    s.src = "https://www.google.com/recaptcha/api.js?onload=eaRecaptchaListo&render=explicit&hl=es";
-    s.async = true;
-    document.head.appendChild(s);
+    let cargado = false;
+    const cargar = () => {
+      if (cargado) return;
+      cargado = true;
+      const s = document.createElement("script");
+      s.src = "https://www.google.com/recaptcha/api.js?onload=eaRecaptchaListo&render=explicit&hl=es";
+      s.async = true;
+      document.head.appendChild(s);
+    };
+    const form = contenedor.closest("form");
+    if ("IntersectionObserver" in window) {
+      new IntersectionObserver((e, obs) => { if (e.some((x) => x.isIntersecting)) { obs.disconnect(); cargar(); } }, { rootMargin: "600px 0px" }).observe(form);
+    }
+    ["focusin", "pointerdown", "touchstart"].forEach((ev) => form.addEventListener(ev, cargar, { once: true, passive: true }));
+    setTimeout(cargar, 8000); // respaldo por si el observador no dispara
   }
 
   function tokenRecaptcha() {

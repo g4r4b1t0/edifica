@@ -15,3 +15,11 @@ customHeaders:
     headers:
       - key: Cache-Control
         value: public, max-age=86400
+  - pattern: '/og.jpg'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=86400
+  - pattern: '/favicon.ico'
+    headers:
+      - key: Cache-Control
+        value: public, max-age=86400

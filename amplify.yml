@@ -1,7 +1,6 @@
 # Amplify Hosting: sitio estático sin build.
 # Los custom HTTP headers van en customHttp.yml (raíz del repo), no en este buildspec.
-# REEMPLAZAR: al crear og.jpg y /obras/ con fotos reales, agregarlas a artifacts.files
-# (og.jpg y obras/**/*) para que se publiquen.
+# REEMPLAZAR: al crear /obras/ con fotos reales, agregar obras/**/* a artifacts.files para que se publique.
 version: 1
 frontend:
   phases:
@@ -15,4 +14,6 @@ frontend:
       - cotizar/**/*
       - assets/**/*
       - robots.txt
+      - og.jpg
+      - favicon.ico
       - sitemap.xml
