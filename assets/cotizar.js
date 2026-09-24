@@ -237,7 +237,9 @@
     } catch (err) {
       console.error(err);
       estado.className = "estado error";
-      estado.innerHTML = `No pudimos enviar la cotización. Revisa tu conexión e inténtalo de nuevo, o escríbenos por <a href="${EA.urlWa()}" target="_blank" rel="noopener">WhatsApp</a>.`;
+      estado.innerHTML = err.message === "captcha-pendiente"
+        ? "Marca la casilla “No soy un robot” para enviar la cotización."
+        : `No pudimos enviar la cotización. Revisa tu conexión e inténtalo de nuevo, o escríbenos por <a href="${EA.urlWa()}" target="_blank" rel="noopener">WhatsApp</a>.`;
       estado.hidden = false;
     } finally {
       btnSig.disabled = false;

@@ -4,8 +4,8 @@
 window.CONFIG = {
   // Endpoint del backend (API Gateway + Lambda). Ver DEPLOY.md
   API_ENDPOINT: "https://h6pddmuujl.execute-api.sa-east-1.amazonaws.com/contacto",
-  // Clave de sitio reCAPTCHA v3 (pública)
-  RECAPTCHA_SITE_KEY: "6LfYkcstAAAAAFDsOIYgTEW7IfXe7vQcUECzNpow",
+  // Clave de sitio reCAPTCHA v2 casilla (pública)
+  RECAPTCHA_SITE_KEY: "6LfYkcstAAAAAIN3Z_NXrKlwAqAC5KnfjnmzI1Ha",
   // WhatsApp en formato internacional sin + ni espacios
   WHATSAPP_NUMERO: "56995924753",
   TELEFONO_VISIBLE: "+56 9 9592 4753",

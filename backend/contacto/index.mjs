@@ -1,11 +1,10 @@
 // Lambda: formularios de Edifica Araucanía (visita técnica y cotización)
-// Runtime: Node.js 20.x (ESM). Valida reCAPTCHA v3 y envía correos vía Amazon SES v2.
+// Runtime: Node.js 20.x (ESM). Valida reCAPTCHA v2 y envía correos vía Amazon SES v2.
 //
 // Variables de entorno:
-//   RECAPTCHA_SECRET_PARAM  Nombre del parámetro SSM (SecureString) con la clave secreta reCAPTCHA v3
+//   RECAPTCHA_SECRET_PARAM  Nombre del parámetro SSM (SecureString) con la clave secreta reCAPTCHA v2
 //   RECAPTCHA_SECRET      Alternativa directa (solo desarrollo)
 //   TABLA_FORMULARIOS     Tabla DynamoDB donde se guarda cada envío
-//   RECAPTCHA_MIN_SCORE   Umbral de score (default 0.5)
 //   SES_FROM              Remitente verificado, ej: "Edifica Araucanía <no-responder@edificaraucania.cl>"
 //   SES_TO                Destinatario(s) interno(s), separados por coma
 //   ALLOWED_ORIGINS       Orígenes permitidos (CORS), separados por coma
@@ -25,7 +24,6 @@ const {
   RECAPTCHA_SECRET,
   RECAPTCHA_SECRET_PARAM,
   TABLA_FORMULARIOS,
-  RECAPTCHA_MIN_SCORE = "0.5",
   SES_FROM,
   SES_TO = "",
   ALLOWED_ORIGINS = "https://edificaraucania.cl,https://www.edificaraucania.cl",
@@ -89,7 +87,7 @@ const marcarCorreo = (ref, estado, error) =>
     ExpressionAttributeValues: { ":e": estado, ":m": error ? String(error).slice(0, 300) : null },
   })).catch((e) => console.error("marcar-correo", e));
 
-async function verificarRecaptcha(token, accion, ip) {
+async function verificarRecaptcha(token, ip) {
   const params = new URLSearchParams({ secret: await secretoRecaptcha(), response: token });
   if (ip) params.append("remoteip", ip);
   const r = await fetch("https://www.google.com/recaptcha/api/siteverify", {
@@ -98,8 +96,7 @@ async function verificarRecaptcha(token, accion, ip) {
     body: params,
   });
   const d = await r.json();
-  const score = Number(d.score);
-  return { ok: d.success === true && d.action === accion && score >= Number(RECAPTCHA_MIN_SCORE), score };
+  return { ok: d.success === true }; // v2: sin score ni action
 }
 
 function tablaHtml(titulo, filas) {
@@ -192,7 +189,7 @@ export const handler = async (event) => {
   const ip = event.requestContext?.http?.sourceIp || event.requestContext?.identity?.sourceIp;
   let captcha;
   try {
-    captcha = await verificarRecaptcha(d.recaptchaToken, accion, ip);
+    captcha = await verificarRecaptcha(d.recaptchaToken, ip);
     if (!captcha.ok) return respuesta(403, { ok: false, error: "captcha" }, origin);
   } catch (e) {
     console.error("recaptcha", e);
@@ -209,7 +206,6 @@ export const handler = async (event) => {
       contacto: c,
       detalle: obra,
       correo: "pendiente",
-      captchaScore: captcha.score,
       ip,
       userAgent: txt(event.headers?.["user-agent"] || event.headers?.["User-Agent"], 300),
       origen: origin,

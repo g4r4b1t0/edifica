@@ -18,9 +18,6 @@ Parameters:
     Type: String
     Default: /edifica/recaptcha-secret
     Description: Parametro SSM SecureString (crearlo antes, ver DEPLOY.md)
-  RecaptchaMinScore:
-    Type: String
-    Default: "0.5"
 
 Resources:
   Formularios:
@@ -66,7 +63,6 @@ Resources:
         Variables:
           TABLA_FORMULARIOS: !Ref Formularios
           RECAPTCHA_SECRET_PARAM: !Ref RecaptchaSecretParam
-          RECAPTCHA_MIN_SCORE: !Ref RecaptchaMinScore
           SES_FROM: !Ref SesFrom
           SES_TO: !Ref SesTo
           ALLOWED_ORIGINS: !Ref AllowedOrigins

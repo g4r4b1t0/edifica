@@ -581,6 +581,7 @@
 
         <p class="estado" id="f-estado" role="status" aria-live="polite" hidden></p>
 
+        <div class="recaptcha-caja" data-recaptcha></div>
         <p class="legal-captcha">Este sitio está protegido por reCAPTCHA y aplican la <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Política de privacidad</a> y los <a href="https://policies.google.com/terms" target="_blank" rel="noopener">Términos del servicio</a> de Google.</p>
       </div>
     </form>
@@ -637,6 +638,7 @@
       if (typeof window.gtag === "function") window.gtag("event", "generate_lead", { formulario: "visita", tipo_obra: datos.tipo_obra, comuna: datos.comuna });
     } catch (err) {
       console.error(err);
+      if (err.message === "captcha-pendiente") { mostrar("error", "Marca la casilla “No soy un robot” para enviar la solicitud."); return; }
       mostrar("error", `No pudimos enviar la solicitud. Revisa tu conexión e inténtalo de nuevo, o escríbenos directo por <a href="${EA.urlWa()}" target="_blank" rel="noopener">WhatsApp</a>.`);
     } finally {
       boton.disabled = false;

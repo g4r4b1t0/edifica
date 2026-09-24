@@ -314,6 +314,7 @@ p{margin:0}
 .enviar .boton{background:var(--teal-900);color:var(--papel)}
 .enviar .boton:hover{background:var(--teal-800)}
 .enviar .boton[disabled]{opacity:.65;cursor:progress}
+.recaptcha-caja{grid-column:1 / -1;min-height:78px;max-width:100%;overflow:hidden}
 .legal-captcha{grid-column:1 / -1;font-size:var(--t-xs);color:var(--zinc)}
 .legal-captcha a{color:var(--zinc)}
 .estado{grid-column:1 / -1;padding:.9rem 1rem;border-radius:var(--radio-s);font-size:var(--t-s)}

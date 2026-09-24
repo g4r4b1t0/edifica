@@ -9,7 +9,7 @@ edifica-araucania/
 ├── assets/
 │   ├── estilos.css             Estilos compartidos
 │   ├── config.js               CONFIG compartida (endpoint, reCAPTCHA, WhatsApp, Google, estimador)
-│   ├── comun.js                WhatsApp, reseñas, reCAPTCHA v3 y envío al backend
+│   ├── comun.js                WhatsApp, reseñas, reCAPTCHA v2 y envío al backend
 │   └── cotizar.js              Lógica del cotizador y resumen en vivo
 ├── robots.txt
 ├── sitemap.xml
@@ -17,7 +17,7 @@ edifica-araucania/
 ├── amplify.yml                   Build spec de Amplify (sin build)
 ├── customHttp.yml                Custom headers de Amplify (paso 8)
 ├── DEPLOY.md
-└── backend/contacto/index.mjs    Lambda Node 20: reCAPTCHA v3 + DynamoDB + SES v2 (visita y cotización)
+└── backend/contacto/index.mjs    Lambda Node 20: reCAPTCHA v2 + DynamoDB + SES v2 (visita y cotización)
 ```
 
 ## Arquitectura
@@ -26,7 +26,7 @@ edifica-araucania/
 Navegador ──> Amplify Hosting (index.html, CloudFront, HTTPS)
     │
     └─ POST JSON ──> API Gateway HTTP API (/contacto) ──> Lambda
-                                                          ├─> Google siteverify (reCAPTCHA v3)
+                                                          ├─> Google siteverify (reCAPTCHA v2)
                                                           ├─> DynamoDB (guarda cada envío, antes de enviar correos)
                                                           └─> Amazon SES v2 (aviso interno + autorespuesta)
 ```
@@ -46,11 +46,11 @@ aws cloudformation deploy --region sa-east-1 --stack-name edifica-contacto --tem
 
 El output `Endpoint` va en `API_ENDPOINT` de `assets/config.js`. La identidad SES (paso 2) se verifica aparte.
 
-Cada envío queda en DynamoDB con `ref`, `tipo` (`contacto` o `cotizacion`), `creado`, `contacto`, `detalle`, `captchaScore`, `ip` y `correo` (`pendiente`, `enviado` o `error`). Si SES falla, el envío igual queda guardado y la API responde ok; busca `correo = error` para reintentar a mano.
+Cada envío queda en DynamoDB con `ref`, `tipo` (`contacto` o `cotizacion`), `creado`, `contacto`, `detalle`, `ip` y `correo` (`pendiente`, `enviado` o `error`). Si SES falla, el envío igual queda guardado y la API responde ok; busca `correo = error` para reintentar a mano.
 
 ## Pasos
 
-1. **reCAPTCHA v3** (https://www.google.com/recaptcha/admin): crear sitio tipo v3 con dominios `edificaraucania.cl`, `www.edificaraucania.cl`, el dominio `*.amplifyapp.com` de preview y `localhost`. Guardar site key (pública) y secret.
+1. **reCAPTCHA v2** (https://www.google.com/recaptcha/admin): crear sitio tipo v2 (casilla «No soy un robot») con dominios `edificaraucania.cl`, `www.edificaraucania.cl`, el dominio `*.amplifyapp.com` de preview y `localhost`. Guardar site key (pública) y secret.
 2. **SES**
    - Verificar identidad de dominio `edificaraucania.cl` con Easy DKIM (3 CNAME).
    - Opcional: dominio MAIL FROM personalizado (`mail.edificaraucania.cl`) y registro DMARC `_dmarc` con `p=none` al inicio.
@@ -58,7 +58,6 @@ Cada envío queda en DynamoDB con `ref`, `tipo` (`contacto` o `cotizacion`), `cr
 3. **Secreto**: guardar `RECAPTCHA_SECRET` en SSM Parameter Store (SecureString) o Secrets Manager y leerlo en el despliegue o en frío desde la Lambda.
 4. **Lambda** `edifica-contacto`: Node.js 20.x, 256 MB, timeout 10 s. Variables:
    - `RECAPTCHA_SECRET`
-   - `RECAPTCHA_MIN_SCORE=0.5`
    - `SES_FROM="Edifica Araucanía <no-responder@edificaraucania.cl>"`
    - `SES_TO=contacto@edificaraucania.cl` (y el correo del hermano)
    - `ALLOWED_ORIGINS=https://edificaraucania.cl,https://www.edificaraucania.cl,https://main.XXXX.amplifyapp.com`
@@ -67,7 +66,7 @@ Cada envío queda en DynamoDB con `ref`, `tipo` (`contacto` o `cotizacion`), `cr
 5. **API Gateway HTTP API**: ruta `POST /contacto` y `OPTIONS /contacto` → Lambda. Throttling: burst 5, rate 2 req/s.
 6. **Amplify Hosting**: app sin build (artefacto = raíz), rama `main`. Conectar dominio `edificaraucania.cl` y `www` (redirigir www → apex).
 7. **Configurar `assets/config.js`**: endpoint, site key, WhatsApp, teléfono visible, enlaces de Google y (opcional) el estimador.
-   - Los dos formularios usan el mismo endpoint. El campo `formulario` (`visita` o `cotizacion`) define la validación, y la acción reCAPTCHA debe coincidir (`contacto` o `cotizacion`).
+   - Los dos formularios usan el mismo endpoint. El campo `formulario` (`visita` o `cotizacion`) define la validación, .
    - La Lambda responde `{ ok: true, ref: "EA-XXXXXX" }`; el código se muestra al cliente y va en el asunto de los correos.
 8. **Headers**: definidos en `customHttp.yml` (raíz del repo), que Amplify aplica al desplegar. El `Content-Security-Policy` es compatible con reCAPTCHA y Google Fonts. Alternativa: configurarlos en la consola (Hosting → Custom headers) con el mismo YAML; en ese caso borra `customHttp.yml` para que la consola no quede sobrescrita:
 
@@ -82,7 +81,7 @@ customHeaders:
       - key: Referrer-Policy
         value: strict-origin-when-cross-origin
       - key: Content-Security-Policy
-        value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; frame-src https://www.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://www.gstatic.com; connect-src 'self' https://*.execute-api.sa-east-1.amazonaws.com https://www.google.com"
+        value: "default-src 'self'; script-src 'self' 'unsafe-inline' https://www.google.com https://www.gstatic.com; frame-src https://www.google.com https://recaptcha.google.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://www.gstatic.com; connect-src 'self' https://*.execute-api.sa-east-1.amazonaws.com https://www.google.com"
 ```
 
 9. **Google Business Profile**: crear/verificar la ficha con el mismo teléfono y URL.

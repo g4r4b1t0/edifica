@@ -1,4 +1,4 @@
-/* Utilidades compartidas: WhatsApp, reseñas, reCAPTCHA v3 y envío al backend */
+/* Utilidades compartidas: WhatsApp, reseñas, reCAPTCHA v2 y envío al backend */
 (function(){
   const C = window.CONFIG;
   const configurado = (v) => typeof v === "string" && v !== "" && !v.includes("REEMPLAZAR");
@@ -23,40 +23,40 @@
     }
   }
 
-  // reCAPTCHA v3
-  if (configurado(C.RECAPTCHA_SITE_KEY)) {
+  // reCAPTCHA v2 (casilla con desafío): un widget por página, dentro de [data-recaptcha]
+  let widgetId = null;
+  const contenedor = document.querySelector("[data-recaptcha]");
+  if (contenedor && configurado(C.RECAPTCHA_SITE_KEY)) {
+    window.eaRecaptchaListo = () => {
+      widgetId = grecaptcha.render(contenedor, { sitekey: C.RECAPTCHA_SITE_KEY });
+    };
     const s = document.createElement("script");
-    s.src = `https://www.google.com/recaptcha/api.js?render=${encodeURIComponent(C.RECAPTCHA_SITE_KEY)}`;
+    s.src = "https://www.google.com/recaptcha/api.js?onload=eaRecaptchaListo&render=explicit&hl=es";
     s.async = true;
     document.head.appendChild(s);
   }
 
-  function tokenRecaptcha(accion) {
-    return new Promise((resolve, reject) => {
-      if (!configurado(C.RECAPTCHA_SITE_KEY)) return reject(new Error("recaptcha-no-configurado"));
-      let intentos = 0;
-      (function esperar(){
-        if (window.grecaptcha && grecaptcha.ready) {
-          grecaptcha.ready(() => grecaptcha.execute(C.RECAPTCHA_SITE_KEY, { action: accion }).then(resolve, reject));
-        } else if (intentos++ < 50) {
-          setTimeout(esperar, 100);
-        } else {
-          reject(new Error("recaptcha-no-cargo"));
-        }
-      })();
-    });
+  function tokenRecaptcha() {
+    if (widgetId === null) throw new Error("recaptcha-no-cargo");
+    const token = grecaptcha.getResponse(widgetId);
+    if (!token) throw new Error("captcha-pendiente");
+    return token;
   }
 
-  async function enviar(datos, accion) {
-    datos.recaptchaToken = await tokenRecaptcha(accion);
-    const r = await fetch(C.API_ENDPOINT, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(datos)
-    });
-    const cuerpo = await r.json().catch(() => ({}));
-    if (!r.ok || !cuerpo.ok) throw new Error(cuerpo.error || "error-servidor");
-    return cuerpo;
+  async function enviar(datos) {
+    datos.recaptchaToken = tokenRecaptcha();
+    try {
+      const r = await fetch(C.API_ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(datos)
+      });
+      const cuerpo = await r.json().catch(() => ({}));
+      if (!r.ok || !cuerpo.ok) throw new Error(cuerpo.error || "error-servidor");
+      return cuerpo;
+    } finally {
+      grecaptcha.reset(widgetId); // el token es de un solo uso
+    }
   }
 
   window.EA = { configurado, urlWa, enviar };
