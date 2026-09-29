@@ -69,7 +69,8 @@ async function guardar(item) {
       await db.send(new PutCommand({
         TableName: TABLA_FORMULARIOS,
         Item: { ...item, ref },
-        ConditionExpression: "attribute_not_exists(ref)",
+        ConditionExpression: "attribute_not_exists(#ref)", // "ref" es palabra reservada en DynamoDB
+        ExpressionAttributeNames: { "#ref": "ref" },
       }));
       return ref;
     } catch (e) {
